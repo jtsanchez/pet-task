@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "to-do-app",
-    "slug": "to-do-app",
+    "name": "Pet Tasks",
+    "slug": "pet-tasks",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,11 +19,16 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "name": "Pet Tasks",
+      "shortName": "Pet Tasks"
     },
     "plugins": [
       "expo-audio",
       "expo-asset"
-    ]
+    ],
+    "experiments": {
+      "baseUrl": "/pet-tasks"
+    }
   }
 }

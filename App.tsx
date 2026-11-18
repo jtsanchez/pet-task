@@ -40,6 +40,16 @@ import { SPECIES_LABEL, resolveColor } from './src/palette';
 import { clearData, loadData, saveData } from './src/storage';
 import { NEXT_PREF, Theme, ThemeContext, resolveTheme } from './src/theme';
 
+const IS_WEB = Platform.OS === 'web';
+
+/**
+ * Testing tools (skip day, reset). Shown in development, and in the public web demo
+ * (built with EXPO_PUBLIC_DEMO=1) so visitors can try a level-up without waiting a day.
+ * Never shown in store builds.
+ */
+const IS_DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
+const SHOW_TOOLS = __DEV__ || IS_DEMO;
+
 const MOOD_TEXT = {
   happy: 'Feeling happy! 💛',
   sad: 'Feeling sad… finish your 3 tasks to cheer them up.',
@@ -56,6 +66,11 @@ export default function App() {
   const systemScheme = useColorScheme();
   const theme = resolveTheme(data?.themePref ?? 'system', systemScheme);
   const styles = useMemo(() => createStyles(theme), [theme]);
+
+  // On the web, colour the page around the phone-width column to match the theme.
+  useEffect(() => {
+    if (IS_WEB && typeof document !== 'undefined') document.body.style.backgroundColor = theme.bg;
+  }, [theme.bg]);
 
   // Sound effects respect the iPhone silent switch.
   useEffect(() => {
@@ -197,22 +212,22 @@ export default function App() {
       tasks: day.tasks.map((t, i) => (i === index ? { ...t, text } : t)),
     }));
 
-  const confirmReset = () =>
-    Alert.alert(
-      'Are you sure?',
-      `${name} at Lv ${level} will be reset. All tasks and progress will be lost.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Reset',
-          style: 'destructive',
-          onPress: async () => {
-            await clearData();
-            setData({ ...initialData(), themePref: data.themePref });
-          },
-        },
-      ],
-    );
+  const confirmReset = () => {
+    const message = `${name} at Lv ${level} will be reset. All tasks and progress will be lost.`;
+    const reset = async () => {
+      await clearData();
+      setData({ ...initialData(), themePref: data.themePref });
+    };
+    // React Native's Alert has no buttons on the web, so use the browser's confirm dialog there.
+    if (IS_WEB) {
+      if (window.confirm(`Are you sure?\n\n${message}`)) reset();
+      return;
+    }
+    Alert.alert('Are you sure?', message, [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Reset', style: 'destructive', onPress: reset },
+    ]);
+  };
 
   return (
     <ThemeContext.Provider value={theme}>
@@ -242,8 +257,9 @@ export default function App() {
           <TodayTasks tasks={todayTasks} onToggle={toggleTask} />
           <PlanTomorrow tasks={tomorrowTasks} onChange={editTomorrow} />
 
-          {__DEV__ && (
+          {SHOW_TOOLS && (
             <View style={styles.devRow}>
+              {IS_DEMO && <Text style={styles.devInfo}>Demo tools: try a whole week in a minute</Text>}
               <Pressable
                 onPress={() => setData({ ...data, devDayOffset: data.devDayOffset + 1 })}
                 style={styles.devButton}
@@ -253,7 +269,7 @@ export default function App() {
               <Pressable onPress={confirmReset} style={styles.devButton}>
                 <Text style={styles.devText}>↺ Reset app</Text>
               </Pressable>
-              <Text style={styles.devInfo}>dev · today = {today}</Text>
+              {__DEV__ && <Text style={styles.devInfo}>dev · today = {today}</Text>}
             </View>
           )}
         </ScrollView>
@@ -264,12 +280,15 @@ export default function App() {
 
 const createStyles = (t: Theme) =>
   StyleSheet.create({
-    screen: { flex: 1, backgroundColor: t.bg },
+    // On the web, keep a phone-width column centred on wide screens.
+    screen: IS_WEB
+      ? { flex: 1, backgroundColor: t.bg, width: '100%', maxWidth: 480, alignSelf: 'center' }
+      : { flex: 1, backgroundColor: t.bg },
     center: { justifyContent: 'center', alignItems: 'center' },
-    content: { paddingTop: 64, paddingHorizontal: 16, paddingBottom: 40 },
+    content: { paddingTop: IS_WEB ? 24 : 64, paddingHorizontal: 16, paddingBottom: 40 },
     petArea: { alignItems: 'center', marginBottom: 20 },
     headerRow: { alignSelf: 'stretch', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    topBar: { paddingTop: 56, paddingHorizontal: 16, alignItems: 'flex-end' },
+    topBar: { paddingTop: IS_WEB ? 16 : 56, paddingHorizontal: 16, alignItems: 'flex-end' },
     nameButton: { flexDirection: 'row', alignItems: 'center', marginTop: 8, paddingHorizontal: 12, paddingVertical: 4 },
     petName: { fontSize: 24, fontWeight: '800', color: t.text },
     editIcon: { marginLeft: 6, fontSize: 18, color: t.subtle },
