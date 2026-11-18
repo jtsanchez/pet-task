@@ -1,10 +1,10 @@
-# 🐾 Pet Tasks
+# 🐾 Pet Task
 
 **A tiny to-do app with a virtual pet that grows when you get things done.**
 
 Each evening you plan **3 tasks for tomorrow**. Finish all 3 the next day and your pet levels up on the spot; miss them and it gets sad. No streaks to lose, no guilt spirals: just one small win a day.
 
-**[▶ Try the live demo](https://jtsanchez.github.io/pet-tasks/)** · built with React Native + Expo · TypeScript
+**[▶ Try the live demo](https://jtsanchez.github.io/pet-task/)** · built with React Native + Expo · TypeScript
 
 <!--
 Screenshots: add images to docs/screenshots/ and uncomment this block.
@@ -81,8 +81,8 @@ assets/sounds/levelup.wav    Chime generated in code (no third-party audio)
 ## Run it locally
 
 ```bash
-git clone https://github.com/jtsanchez/pet-tasks.git
-cd pet-tasks
+git clone https://github.com/jtsanchez/pet-task.git
+cd pet-task
 npm install
 npx expo start          # scan the QR code with Expo Go, or press "w" for web
 ```

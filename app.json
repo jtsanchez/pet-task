@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Pet Tasks",
-    "slug": "pet-tasks",
+    "name": "Pet Task",
+    "slug": "pet-task",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -20,15 +20,15 @@
     },
     "web": {
       "favicon": "./assets/favicon.png",
-      "name": "Pet Tasks",
-      "shortName": "Pet Tasks"
+      "name": "Pet Task",
+      "shortName": "Pet Task"
     },
     "plugins": [
       "expo-audio",
       "expo-asset"
     ],
     "experiments": {
-      "baseUrl": "/pet-tasks"
+      "baseUrl": "/pet-task"
     }
   }
 }
